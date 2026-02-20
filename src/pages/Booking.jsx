@@ -121,8 +121,8 @@ export default function Booking() {
 
         .back-btn {
           position: fixed;
-          top: 15px;
-          left: 15px;
+          top: 35px;
+          left: 25px;
           z-index: 1000;
           display: flex;
           align-items: center;
