@@ -188,7 +188,7 @@ export default function Home() {
         /* 🔥 GLASS SIGN IN BUTTON */
         .top-auth {
           position: absolute;
-          top: 50px;
+          top: 70px;
           right: 20px;
         }
 
