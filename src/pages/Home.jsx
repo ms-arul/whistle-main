@@ -7,6 +7,7 @@ import { MdOutlinePhoneIphone } from "react-icons/md";
 import { IoClose } from "react-icons/io5";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import AnimatedBackground from "../components/AnimatedBackground";
 
 export default function Home() {
   const navigate = useNavigate();
@@ -15,54 +16,46 @@ export default function Home() {
   const [phone, setPhone] = useState("");
   const [error, setError] = useState("");
 
-  // 🔒 VALIDATION LOGIC ONLY (NO UI CHANGE)
   const handlePhoneChange = (e) => {
-    let value = e.target.value.replace(/\D/g, ""); // only digits
-
+    let value = e.target.value.replace(/\D/g, "");
     if (value.length > 10) return;
 
     setPhone(value);
 
-    if (value.length === 0) {
-      setError("");
-    } else if (!/^[6-9]/.test(value)) {
-      setError("Invalid");
-    } else if (value.length < 10) {
-      setError("Invalid");
-    } else {
-      setError("");
-    }
+    if (value.length === 0) setError("");
+    else if (!/^[6-9]/.test(value)) setError("Invalid");
+    else if (value.length < 10) setError("Invalid");
+    else setError("");
   };
 
   const isValid = phone.length === 10 && /^[6-9]/.test(phone);
 
   return (
     <>
+      {/* 🔥 BACKGROUND */}
+      <AnimatedBackground />
+
       <main className="home">
         <section className="hero">
 
-          {/* 🔐 TOP RIGHT BUTTON */}
+          {/* SIGN IN */}
           <div className="top-auth">
-            <button onClick={() => setShowAuth(true)}>
-              Sign In
-            </button>
+            <button onClick={() => setShowAuth(true)}>Sign In</button>
           </div>
 
           <div className="content">
             <WhistleLogo size={200} />
 
             <h1 className="title">
-              Whistle
-              <span className="icon">
-                <HiSparkles />
-              </span>
+              <span className="gradient-text">Whistle</span>
+              <HiSparkles className="spark-icon" />
             </h1>
 
             <p className="tagline">
               Designed for Life’s <span>Biggest Moments</span>
             </p>
 
-            <button 
+            <button
               className="primary-btn"
               onClick={() => navigate("/booking")}
             >
@@ -70,46 +63,36 @@ export default function Home() {
               <span>Book Your Event</span>
             </button>
 
-
             {/* FEATURES */}
             <div className="features">
-              <div className="feature">
-                <Calendar />
-                <span>Easy Booking</span>
-              </div>
-              <div className="feature">
-                <Users />
-                <span>Trusted Vendors</span>
-              </div>
-              <div className="feature">
-                <Star />
-                <span>Premium Events</span>
-              </div>
-              <div className="feature">
-                <Sparkles />
-                <span>Memorable Experience</span>
-              </div>
+              {[
+                { icon: <Calendar />, text: "Easy Booking" },
+                { icon: <Users />, text: "Trusted Vendors" },
+                { icon: <Star />, text: "Premium Events" },
+                { icon: <Sparkles />, text: "Memorable Experience" },
+              ].map((f, i) => (
+                <div className="feature" key={i}>
+                  {f.icon}
+                  <span>{f.text}</span>
+                </div>
+              ))}
             </div>
           </div>
         </section>
       </main>
 
-      {/* 🔐 AUTH MODAL */}
+      {/* AUTH MODAL */}
       {showAuth && (
         <div className="auth-modal" onClick={() => setShowAuth(false)}>
           <div className="auth-box" onClick={(e) => e.stopPropagation()}>
 
-            <button
-              className="close-btn"
-              onClick={() => setShowAuth(false)}
-            >
+            <button className="close-btn" onClick={() => setShowAuth(false)}>
               <IoClose />
             </button>
 
             <h2>Welcome</h2>
             <p>Sign in to continue your experience</p>
 
-            {/* OTP BUTTON */}
             <button
               className="auth-option otp"
               onClick={() => setShowOtpInput(!showOtpInput)}
@@ -118,7 +101,6 @@ export default function Home() {
               <span>Continue with OTP</span>
             </button>
 
-            {/* OTP DROPDOWN */}
             <div className={`otp-box ${showOtpInput ? "active" : ""}`}>
               <div className="phone-input">
                 <span className="code">+91</span>
@@ -130,20 +112,19 @@ export default function Home() {
                 />
               </div>
 
+              {error && <p className="error">{error}</p>}
+
               <button
                 className="send-otp"
                 disabled={!isValid}
                 onClick={() => {
-                  if (isValid) {
-                    alert("OTP Sent to +91 " + phone);
-                  }
+                  if (isValid) alert("OTP Sent to +91 " + phone);
                 }}
               >
                 Send OTP
               </button>
             </div>
 
-            {/* GOOGLE BUTTON */}
             <button className="auth-option google">
               <FcGoogle />
               <span>Continue with Google</span>
@@ -153,6 +134,7 @@ export default function Home() {
         </div>
       )}
 
+      {/* STYLES */}
       <style>{`
         :root {
           --black: #06060b;
@@ -164,15 +146,15 @@ export default function Home() {
           --text-muted: #b9b1da;
         }
 
+        /* FIXED BACKGROUND ISSUE */
         .home {
           height: 100svh;
-          width: 100%;
-          background:
-            radial-gradient(circle at top, rgba(245,199,122,0.25), transparent 55%),
-            linear-gradient(180deg, var(--violet-mid), var(--violet-dark), var(--black));
+          background: transparent; /* ✅ IMPORTANT */
           display: flex;
           align-items: center;
           justify-content: center;
+          position: relative;
+          z-index: 1;
         }
 
         .hero {
@@ -183,116 +165,99 @@ export default function Home() {
           justify-content: center;
           text-align: center;
           position: relative;
+          z-index: 2;
         }
 
-        /* 🔥 GLASS SIGN IN BUTTON */
         .top-auth {
           position: absolute;
-          top: 70px;
-          right: 20px;
+          top: 40px;
+          right: 25px;
         }
 
         .top-auth button {
           padding: 8px 20px;
           border-radius: 999px;
-          background: rgba(255, 255, 255, 0.08);
+          background: rgba(255,255,255,0.08);
           backdrop-filter: blur(12px);
-          -webkit-backdrop-filter: blur(12px);
-          border: 1px solid rgba(255, 255, 255, 0.15);
+          border: 1px solid rgba(255,255,255,0.15);
           color: var(--gold);
-          font-size: 0.85rem;
-          font-weight: 500;
           cursor: pointer;
-          transition: all 0.3s ease;
-          box-shadow: 0 0 10px rgba(245, 199, 122, 0.15);
+          transition: 0.3s;
         }
 
         .top-auth button:hover {
-          background: rgba(245, 199, 122, 0.15);
-          border: 1px solid var(--gold);
-          color: #fff;
-          transform: translateY(-2px) scale(1.05);
-          box-shadow: 0 0 20px rgba(245, 199, 122, 0.4);
-        }
-
-        .top-auth button:active {
-          transform: scale(0.95);
+          background: rgba(245,199,122,0.2);
+          transform: scale(1.08);
         }
 
         .content {
           max-width: 360px;
-          padding: 24px;
           display: flex;
           flex-direction: column;
           align-items: center;
-          animation: fadeIn 1s ease;
+          animation: fadeUp 1s ease;
         }
 
-        .title {
-          font-family: "Playfair Display", serif;
-          font-size: clamp(2.2rem, 5vw, 3.2rem);
-          margin: 18px 0 10px;
-          display: flex;
-          gap: 10px;
-          background: linear-gradient(135deg, var(--gold), #ffffff);
+        .gradient-text {
+          background: linear-gradient(135deg, var(--gold), white);
           -webkit-background-clip: text;
           -webkit-text-fill-color: transparent;
         }
 
-        .icon {
+        .spark-icon {
           color: var(--gold);
-          animation: glow 2s infinite alternate;
+          animation: pulse 2s infinite;
         }
 
         .tagline {
-          font-size: 0.95rem;
-          margin-bottom: 24px;
           color: var(--text-muted);
         }
 
         .tagline span {
           color: var(--gold);
-          font-weight: 600;
         }
 
         .primary-btn {
-          display: inline-flex;
-          align-items: center;
-          gap: 10px;
+          margin: 25px 0;
           padding: 14px 30px;
           border-radius: 999px;
           border: none;
           background: linear-gradient(135deg, var(--gold), var(--gold-soft));
-          color: #2b1c0f;
-          font-size: 0.9rem;
-          font-weight: 600;
           cursor: pointer;
-          margin-bottom: 30px;
+          font-weight: 600;
+          display: flex;
+          gap: 10px;
+          align-items: center;
           transition: 0.3s;
+          box-shadow: 0 0 15px rgba(245,199,122,0.4);
         }
 
         .primary-btn:hover {
-          transform: scale(1.05);
+          transform: scale(1.1);
+          box-shadow: 0 0 30px rgba(245,199,122,0.8);
         }
 
         .features {
-          width: 100%;
           display: flex;
           flex-direction: column;
-          gap: 18px;
+          gap: 15px;
         }
 
         .feature {
           display: flex;
+          gap: 12px;
           align-items: center;
-          gap: 14px;
-          font-size: 0.9rem;
-          color: var(--text-main);
+          opacity: 0;
+          animation: fadeUp 0.6s ease forwards;
         }
+
+        .feature:nth-child(1) { animation-delay: 0.3s; }
+        .feature:nth-child(2) { animation-delay: 0.5s; }
+        .feature:nth-child(3) { animation-delay: 0.7s; }
+        .feature:nth-child(4) { animation-delay: 0.9s; }
 
         .feature svg {
           color: var(--gold);
-          width: 18px;
         }
 
         /* MODAL */
@@ -300,7 +265,7 @@ export default function Home() {
           position: fixed;
           inset: 0;
           background: rgba(0,0,0,0.6);
-          backdrop-filter: blur(10px);
+          backdrop-filter: blur(12px);
           display: flex;
           align-items: center;
           justify-content: center;
@@ -309,138 +274,33 @@ export default function Home() {
 
         .auth-box {
           background: rgba(255,255,255,0.05);
-          border: 1px solid rgba(255,255,255,0.1);
-          backdrop-filter: blur(20px);
+          backdrop-filter: blur(25px);
           padding: 30px;
           border-radius: 20px;
           width: 300px;
-          text-align: center;
-          position: relative;
-          animation: fadeIn 0.4s ease;
+          animation: scaleIn 0.4s ease;
         }
 
-        .auth-box h2 {
-          color: var(--gold);
-          margin-bottom: 8px;
+        .error {
+          color: #ff6b6b;
+          font-size: 12px;
         }
 
-        .auth-box p {
-          font-size: 0.85rem;
-          color: var(--text-muted);
-          margin-bottom: 20px;
-        }
-
-        .auth-option {
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          gap: 10px;
-          width: 100%;
-          padding: 12px;
-          margin-bottom: 12px;
-          border-radius: 999px;
-          border: none;
-          font-weight: 600;
-          cursor: pointer;
-          transition: 0.3s;
-        }
-
-        .auth-option svg {
-          font-size: 18px;
-        }
-
-        .auth-option.otp {
-          background: rgba(255,255,255,0.05);
-          border: 1px solid var(--gold);
-          color: var(--gold);
-        }
-
-        .auth-option.otp:hover {
-          background: rgba(245,199,122,0.15);
-          transform: scale(1.04);
-        }
-
-        .auth-option.google {
-          background: rgba(255,255,255,0.9);
-          color: #000;
-        }
-
-        .auth-option.google:hover {
-          transform: scale(1.04);
-          box-shadow: 0 0 12px rgba(255,255,255,0.4);
-        }
-
-        .otp-box {
-          max-height: 0;
-          overflow: hidden;
-          transition: all 0.4s ease;
-        }
-
-        .otp-box.active {
-          max-height: 150px;
-          margin-bottom: 12px;
-        }
-
-        .phone-input {
-          display: flex;
-          align-items: center;
-          background: rgba(255,255,255,0.08);
-          border-radius: 12px;
-          padding: 10px;
-          margin-bottom: 10px;
-        }
-
-        .code {
-          color: var(--gold);
-          margin-right: 8px;
-          font-weight: 600;
-        }
-
-        .phone-input input {
-          background: transparent;
-          border: none;
-          outline: none;
-          color: white;
-          width: 100%;
-        }
-
-        .send-otp {
-          width: 100%;
-          padding: 10px;
-          border-radius: 999px;
-          border: none;
-          background: linear-gradient(135deg, var(--gold), var(--gold-soft));
-          color: #2b1c0f;
-          font-weight: 600;
-          cursor: pointer;
-        }
-
-        .send-otp:disabled {
-          opacity: 0.5;
-          cursor: not-allowed;
-        }
-
-        .close-btn {
-          position: absolute;
-          top: 10px;
-          right: 12px;
-          background: none;
-          border: none;
-          color: var(--gold);
-          font-size: 20px;
-          cursor: pointer;
-        }
-
-        @keyframes fadeIn {
+        @keyframes fadeUp {
           from { opacity: 0; transform: translateY(20px); }
           to { opacity: 1; transform: translateY(0); }
         }
 
-        @keyframes glow {
-          from { text-shadow: 0 0 5px var(--gold); }
-          to { text-shadow: 0 0 20px var(--gold); }
+        @keyframes scaleIn {
+          from { transform: scale(0.8); opacity: 0; }
+          to { transform: scale(1); opacity: 1; }
+        }
+
+        @keyframes pulse {
+          0%,100% { transform: scale(1); }
+          50% { transform: scale(1.3); }
         }
       `}</style>
     </>
   );
-}  
+}
